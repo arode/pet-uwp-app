@@ -59,7 +59,7 @@ namespace TestApp.ViewModels
             get
             {
                 return _navigateToBasketCommand ?? (
-                     _navigateToBasketCommand = new RelayCommand(() =>
+                     _navigateToBasketCommand = new RelayCommand((param) =>
                      {
                          FavoritePets = new ObservableCollection<PetViewModel>(PetList.Where(x => x.IsFavorited).ToList());
                          OnPropertyChanged(nameof(FavoritePets));
@@ -70,9 +70,9 @@ namespace TestApp.ViewModels
 
         private RelayCommand _removeFromFavoritesCommand { get; set; }
         public ICommand RemoveFromFavoritesCommand => _removeFromFavoritesCommand ?? (
-                     _removeFromFavoritesCommand = new RelayCommand(() =>
+                     _removeFromFavoritesCommand = new RelayCommand((param) =>
                      {
-
+                         FavoritePets.Remove(FavoritePets.Single(x => x.PetId == (Guid)param));
                      }));
     }
 }
