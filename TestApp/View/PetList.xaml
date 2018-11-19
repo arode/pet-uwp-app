@@ -30,7 +30,7 @@
                                                  CommandParameter="{x:Bind PetId}"
                                                  HorizontalAlignment="Right"/>
 
-                        </StackPanel>
+                            </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
