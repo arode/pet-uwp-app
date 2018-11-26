@@ -5,11 +5,12 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
-using TestApp.Common;
-using TestApp.Models;
+using PetApp.Common;
+using PetApp.Data;
+using PetApp.Models;
 using Windows.UI.Xaml.Controls;
 
-namespace TestApp.ViewModels
+namespace PetApp.ViewModels
 {
     public class PetListViewModel : BindableBase
     {
@@ -36,17 +37,17 @@ namespace TestApp.ViewModels
         {
             new PetViewModel{
                 Name = "Comet",
-                Age = 5,
+                Age = "Adult",
                 AnimalType = "Cat"
             },
             new PetViewModel{
                 Name = "Charlie",
-                Age = 3,
+                Age = "Young",
                 AnimalType = "Dog"
             },
             new PetViewModel{
                 Name = "Marvin",
-                Age = 4,
+                Age = "Young",
                 AnimalType = "Cat"
             }
         };
@@ -69,10 +70,52 @@ namespace TestApp.ViewModels
         }
 
         private RelayCommand _removeFromFavoritesCommand { get; set; }
-        public ICommand RemoveFromFavoritesCommand => _removeFromFavoritesCommand ?? (
-                     _removeFromFavoritesCommand = new RelayCommand((param) =>
-                     {
-                         FavoritePets.Remove(FavoritePets.Single(x => x.PetId == (Guid)param));
-                     }));
+        public ICommand RemoveFromFavoritesCommand
+        {
+            get
+            {
+                return _removeFromFavoritesCommand ?? (
+              _removeFromFavoritesCommand = new RelayCommand((param) =>
+              {
+                  FavoritePets.Where(x => x.PetId == (Guid)param).First().IsFavorited = false;
+                  FavoritePets.Remove(FavoritePets.Single(x => x.PetId == (Guid)param));
+              }));
+            }
+        }
+
+        private RelayCommand _closeFavoritesCommand { get; set; }
+        public ICommand CloseFavoritesCommand
+        {
+            get
+            {
+                return _closeFavoritesCommand ?? (
+              _closeFavoritesCommand = new RelayCommand((param) =>
+              {
+                  IsFavoritesViewOpen = false;
+              }));
+            }
+        }
+
+        private RelayCommand _loadedCommand { get; set; }
+        public ICommand LoadedCommand
+        {
+            get
+            {
+                return _loadedCommand ?? (
+              _loadedCommand = new RelayCommand(async (param) =>
+              {
+                  PetList.Clear();
+
+                  var pets = await WebHelper.GetPetsAsync();
+
+                  foreach (Pet pet in pets)
+                  {
+                      PetList.Add(new PetViewModel(pet));
+                  }
+              }));
+            }
+        }
+
+
     }
 }

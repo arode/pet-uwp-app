@@ -1,22 +1,40 @@
 ﻿<Page
-    x:Class="TestApp.View.PetList"
+    x:Class="PetApp.View.PetList"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:viewmodels="using:TestApp.ViewModels"
+    xmlns:viewmodels="using:PetApp.ViewModels"
     mc:Ignorable="d"
+    xmlns:Interactivity="using:Microsoft.Xaml.Interactivity"
+    xmlns:core="using:Microsoft.Xaml.Interactions.Core"
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    
+    
     <Page.DataContext>
         <viewmodels:PetListViewModel x:Name="ViewModel"/>
     </Page.DataContext>
+
+    <Interactivity:Interaction.Behaviors>
+        <core:EventTriggerBehavior EventName="Loaded">
+            <core:EventTriggerBehavior.Actions>
+                <core:InvokeCommandAction Command="{x:Bind ViewModel.LoadedCommand, Mode=OneWay}" />
+            </core:EventTriggerBehavior.Actions>
+        </core:EventTriggerBehavior>
+    </Interactivity:Interaction.Behaviors>
 
     <SplitView IsPaneOpen="{x:Bind ViewModel.IsFavoritesViewOpen, Mode=TwoWay}"
                DisplayMode="Overlay"
                OpenPaneLength="296"
                PanePlacement="Right">
         <SplitView.Pane>
-            <ListView ItemsSource="{x:Bind ViewModel.FavoritePets, Mode=OneWay}"
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+            <ListView Grid.Row="0"
+                      ItemsSource="{x:Bind ViewModel.FavoritePets, Mode=OneWay}"
                       x:Name="ListView">
                     <ListView.ItemTemplate>
                         <DataTemplate x:DataType="viewmodels:PetViewModel">
@@ -29,11 +47,21 @@
                                                  Command="{Binding ElementName=ListView, Path=DataContext.RemoveFromFavoritesCommand}"
                                                  CommandParameter="{x:Bind PetId}"
                                                  HorizontalAlignment="Right"/>
-
                             </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>
                 </ListView>
+                <StackPanel Orientation="Horizontal"
+                            Grid.Row="1">
+                    <Button Content="Cancel"
+                    Command="{x:Bind ViewModel.CloseFavoritesCommand, Mode=OneWay}"
+                        VerticalAlignment="Bottom"
+                        Margin="20"/>
+                    <Button Content="Adopt"
+                            Click="Button_Click"
+                            Margin="20"/>
+                </StackPanel>
+            </Grid>
         </SplitView.Pane>
         <Grid>
             <Grid.RowDefinitions>

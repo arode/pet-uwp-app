@@ -1,14 +1,23 @@
 ﻿using System;
-using TestApp.Common;
-using TestApp.Models;
+using PetApp.Common;
+using PetApp.Models;
 
-namespace TestApp.ViewModels
+namespace PetApp.ViewModels
 {
     public class PetViewModel : BindableBase
     {
         public PetViewModel()
         {
             Pet = new Pet();
+        }
+
+        public PetViewModel(Pet pet)
+        {
+            Pet = new Pet();
+            Pet.Name = pet.Name;
+            Pet.Age = pet.Age;
+            Pet.AnimalType = pet.AnimalType;
+            IsFavorited = false;
         }
 
         private Pet Pet;
@@ -38,7 +47,7 @@ namespace TestApp.ViewModels
             }
         }
 
-        public uint? Age
+        public string Age
         {
             set
             {
