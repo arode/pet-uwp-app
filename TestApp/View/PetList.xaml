@@ -47,6 +47,10 @@
                                                  Command="{Binding ElementName=ListView, Path=DataContext.RemoveFromFavoritesCommand}"
                                                  CommandParameter="{x:Bind PetId}"
                                                  HorizontalAlignment="Right"/>
+                                <HyperlinkButton Content="Details"
+                                                 Command="{Binding ElementName=ListView, Path=DataContext.ViewDetailsCommand}"
+                                                 CommandParameter="{x:Bind PetId}"
+                                                 HorizontalAlignment="Right"/>
                             </StackPanel>
                         </DataTemplate>
                     </ListView.ItemTemplate>

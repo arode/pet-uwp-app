@@ -12,18 +12,23 @@ namespace PetApp.Data
     {
         static HttpClient httpClient = new HttpClient();
 
-        public static async Task<IEnumerable<Pet>> GetPetsAsync(int count = 10)
+        private static Uri CreateBaseUri(string action = "find", string output = "basic")
+        {
+            Uri uri = new Uri($"https://api.petfinder.com/pet.{action}?key={PetfinderSecrets.Key}&output={output}&format=json");
+
+            return uri;
+        }
+
+        private static async Task<JObject> GetResponseJObjectAsync(Uri requestUri)
         {
             //Add a user-agent header to the GET request. 
             var headers = httpClient.DefaultRequestHeaders;
 
-            Uri requestUri = new Uri($"https://api.petfinder.com/pet.getRandom?key={PetfinderSecrets.Key}&output=basic&format=json");//&count={count}&location=98103");
-
-            List<Pet> pets = new List<Pet>();
-
             //Send the GET request asynchronously and retrieve the response as a string.
             HttpResponseMessage httpResponse = new HttpResponseMessage();
             string httpResponseBody = "";
+
+            JObject jObject = null;
 
             try
             {
@@ -32,34 +37,73 @@ namespace PetApp.Data
                 httpResponse.EnsureSuccessStatusCode();
                 httpResponseBody = await httpResponse.Content.ReadAsStringAsync();
 
-                var jObject = JObject.Parse(httpResponseBody);
-                var petResult = jObject.SelectToken("petfinder.pet");
+                jObject = JObject.Parse(httpResponseBody);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Web request error");
+                throw ex;
+            }
 
-                //var returnedPets = jObject.SelectTokens("petfinder.pets.pet");
+            return jObject;
+        }
 
-                //foreach (var item in returnedPets)
-                //{
-                //var x = item.SelectToken("name");
-                //var y = item.SelectToken("options");
+        public static async Task<IEnumerable<Pet>> GetPetsAsync(int count = 10)
+        {
+            Uri requestUri = new Uri($"{CreateBaseUri()}&count={count}&location=98103");
 
-                Pet pet = new Pet()
+            List<Pet> pets = new List<Pet>();
+
+            try
+            {
+                var jObject = await GetResponseJObjectAsync(requestUri);
+
+                var returnedPets = jObject.SelectToken("petfinder.pets.pet");
+
+                foreach (var item in returnedPets)
                 {
-                    Name = petResult.SelectToken("name.$t").ToString(),
-                    AnimalType = petResult.SelectToken("animal.$t").ToString(),
-                    Age = petResult.SelectToken("age.$t").ToString()
-                };
+                    Pet pet = new Pet()
+                    {
+                        Name = item.SelectToken("name.$t").ToString(),
+                        AnimalType = item.SelectToken("animal.$t").ToString(),
+                        Age = item.SelectToken("age.$t").ToString(),
+                        Id = item.SelectToken("id.$t").ToString()
+                    };
 
-                pets.Add(pet);
-                //}
+                    pets.Add(pet);
+                }
                 return pets;
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                httpResponseBody = "Error: " + ex.HResult.ToString("X") + " Message: " + ex.Message;
+                Console.WriteLine("Error: " + ex.HResult.ToString("X") + " Message: " + ex.Message);
             }
 
             return null;
         }
 
+
+        public static async Task<string> GetDetailsAsync(string id)
+        {
+            Uri baseUri = CreateBaseUri("get");
+
+            Uri requestUri = new Uri($"{baseUri}&id={id}");
+
+            string description = string.Empty;
+
+            try
+            {
+                var jObject = await GetResponseJObjectAsync(requestUri);
+                var petResponse = jObject.SelectToken("petfinder.pet");
+
+                description = petResponse.SelectToken("description.$t").ToString();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("Error: " + ex.HResult.ToString("X") + " Message: " + ex.Message);
+            }
+
+            return description;
+        }
     }
 }

@@ -17,12 +17,23 @@ namespace PetApp.ViewModels
             Pet.Name = pet.Name;
             Pet.Age = pet.Age;
             Pet.AnimalType = pet.AnimalType;
+            Pet.Id = pet.Id;
             IsFavorited = false;
         }
 
         private Pet Pet;
 
-        public Guid PetId { get; } = Guid.NewGuid();
+        public string PetId
+        {
+            set
+            {
+                SetProperty(ref Pet.Id, value);
+            }
+            get
+            {
+                return Pet.Id;
+            }
+        }
 
         public string Name
         {
@@ -35,6 +46,7 @@ namespace PetApp.ViewModels
                 return Pet.Name;
             }
         }
+
         public string AnimalType
         {
             set

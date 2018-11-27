@@ -77,9 +77,24 @@ namespace PetApp.ViewModels
                 return _removeFromFavoritesCommand ?? (
               _removeFromFavoritesCommand = new RelayCommand((param) =>
               {
-                  FavoritePets.Where(x => x.PetId == (Guid)param).First().IsFavorited = false;
-                  FavoritePets.Remove(FavoritePets.Single(x => x.PetId == (Guid)param));
+                  FavoritePets.Where(x => x.PetId == (string)param).First().IsFavorited = false;
+                  FavoritePets.Remove(FavoritePets.Single(x => x.PetId == (string)param));
               }));
+            }
+        }
+
+        private RelayCommand _viewDetailsCommand { get; set; }
+        public ICommand ViewDetailsCommand
+        {
+            get
+            {
+                return _viewDetailsCommand ?? (
+                _viewDetailsCommand = new RelayCommand(async (param) =>
+                {
+                    string id = (string)param;
+
+                    string details = await WebHelper.GetDetailsAsync(id);
+                }));
             }
         }
 

@@ -99,8 +99,7 @@
     <Compile Include="Common\RelayCommand.cs" />
     <Compile Include="Data\WebHelper.cs" />
     <Compile Include="Models\Pet.cs" />
-    <Compile Include="Models\PetfinderPet.cs" />
-    <Compile Include="Models\PetfinderResponse.cs" />
+    <Compile Include="ViewModels\PetfinderSecrets.cs" />
     <Compile Include="ViewModels\PetListViewModel.cs" />
     <Compile Include="ViewModels\PetViewModel.cs" />
     <Compile Include="View\AdoptionPage.xaml.cs">
